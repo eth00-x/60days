@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#f472b6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>تحدي 60 يوماً لإيثار</title>
+  
+  <!-- Ionic Framework -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+  
+  <!-- ApexCharts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Canvas Confetti for Celebration Effects -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ion-font-family: 'Tajawal', sans-serif;
+      --ion-color-primary: #831843;
+      --ion-color-secondary: #db2777;
+      --ion-color-success: #10b981;
+      --app-bg: #fff1f2;
+      --card-bg: #ffffff;
+    }
+    
+    body { font-family: var(--ion-font-family); }
+    ion-content { --background: var(--app-bg); }
+
+    ion-toolbar {
+      --background: var(--card-bg);
+      --color: var(--ion-color-primary);
+      --border-width: 0 !important;
+      padding-top: env(safe-area-inset-top);
+      border-bottom: 1px solid rgba(244, 114, 182, 0.15);
+    }
+    .header-title-custom { font-weight: 800; font-size: 1.25rem; color: #db2777; }
+
+    /* Top Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(219, 39, 119, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(244, 114, 182, 0.1);
+    }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: #831843; }
+    .stat-label { font-size: 0.8rem; color: #9f1239; font-weight: 500; margin-top: 4px; }
+    .stat-icon-wrapper {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+    }
+    .bg-pink-light { background: #fdf2f8; color: #db2777; }
+    .bg-rose-light { background: #fff1f2; color: #e11d48; }
+
+    /* Day Selector Button */
+    .day-selector-btn {
+      margin: 0 16px 16px 16px;
+      --background: var(--card-bg);
+      --color: #831843;
+      --box-shadow: 0 4px 15px rgba(219, 39, 119, 0.06);
+      --border-radius: 16px;
+      font-weight: 700; font-size: 1.1rem;
+      border: 1px solid rgba(244, 114, 182, 0.2);
+    }
+
+    /* Lists and Cards */
+    .custom-list { background: transparent; margin: 0 16px 24px 16px; }
+    .list-header-custom {
+      font-size: 1.1rem; font-weight: 800; color: #831843;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+
+    ion-item.task-item {
+      --background: var(--card-bg);
+      --border-radius: 14px;
+      --padding-start: 16px;
+      --inner-padding-end: 16px;
+      margin-bottom: 8px; --border-width: 0;
+      box-shadow: 0 2px 10px rgba(219, 39, 119, 0.03);
+      font-weight: 500; font-size: 0.95rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(244, 114, 182, 0.1);
+    }
+
+    /* Checked State Animation */
+    ion-item.task-item.completed { opacity: 0.7; }
+    ion-item.task-item.completed ion-label {
+      text-decoration: line-through; color: #fda4af; transition: all 0.3s ease;
+    }
+    
+    @keyframes checkBounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    ion-checkbox.animated {
+      animation: checkBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    ion-checkbox {
+      --size: 22px;
+      --checkbox-background-checked: #db2777;
+      --border-color-checked: #db2777;
+      --border-radius: 6px; --border-width: 2px; --border-color: #f472b6;
+      margin-inline-end: 12px; transition: transform 0.2s ease;
+    }
+    ion-checkbox::part(container) { border-radius: 6px; }
+
+    /* Badges */
+    .badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+      margin-inline-start: auto; transition: all 0.3s ease; white-space: nowrap;
+    }
+    .badge-meal { background: #fef3c7; color: #d97706; }
+    .badge-gym { background: #fdf2f8; color: #db2777; }
+    .badge-cheat { background: #ffe4e6; color: #e11d48; }
+    .badge-rest { background: #f3e8ff; color: #9333ea; }
+    
+    ion-item.completed .badge { background: #f1f5f9; color: #cbd5e1; }
+
+    /* Chart Container */
+    .chart-wrapper {
+      background: var(--card-bg); border-radius: 20px; padding: 24px 16px; margin: 16px;
+      box-shadow: 0 4px 20px rgba(219, 39, 119, 0.05);
+      border: 1px solid rgba(244, 114, 182, 0.1);
+    }
+    .chart-title { font-weight: 800; font-size: 1.2rem; color: #831843; margin-bottom: 20px; text-align: center; }
+
+    /* Custom Tab Bar */
+    ion-tab-bar {
+      --background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(244, 114, 182, 0.15); padding-bottom: env(safe-area-inset-bottom);
+      height: calc(60px + env(safe-area-inset-bottom));
+    }
+    ion-tab-button { --color: #fda4af; --color-selected: #db2777; }
+    ion-tab-button ion-icon { font-size: 24px; margin-bottom: 4px; }
+    ion-tab-button ion-label { font-weight: 600; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <ion-app>
+    <ion-tabs>
+      
+      <!-- TAB 1: Daily Plan -->
+      <ion-tab tab="plan">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title class="header-title-custom">تحدي 60 يوماً لإيثار 🌸</ion-title>
+            <ion-buttons slot="end">
+              <ion-button color="primary"><ion-icon name="heart" style="color: #db2777;"></ion-icon></ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        
+        <ion-content>
+          <!-- Top Stats -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-pink-light">
+                <ion-icon name="flame" style="font-size: 20px;"></ion-icon>
+              </div>
+              <div class="stat-value" id="streak-stat">0</div>
+              <div class="stat-label">مهام مكتملة</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrapper bg-rose-light">
+                <ion-icon name="barbell" style="font-size: 20px;"></ion-icon>
+              </div>
+              <div class="stat-value" id="today-progress">0%</div>
+              <div class="stat-label">إنجاز اليوم</div>
+            </div>
+          </div>
+
+          <!-- Day Selector -->
+          <ion-button expand="block" class="day-selector-btn" id="open-day-select">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            <span id="day-btn-text">عرض الأيام: اليوم 1</span>
+            <ion-icon name="chevron-down-outline" slot="end"></ion-icon>
+          </ion-button>
+          <ion-select id="day-select" interface="action-sheet" placeholder="اختر اليوم" class="ion-hide"></ion-select>
+          
+          <!-- Dynamic Lists Containers -->
+          <div id="nutrition-list" class="custom-list"></div>
+          <div id="workout-list" class="custom-list"></div>
+          
+          <div style="height: 20px;"></div>
+        </ion-content>
+      </ion-tab>
+
+      <!-- TAB 2: Progress -->
+      <ion-tab tab="progress">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title class="header-title-custom">مؤشرات الأنوثة والياقة</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        
+        <ion-content>
+          <div class="chart-wrapper">
+            <div class="chart-title">معدل الإنجاز العام</div>
+            <div id="apex-chart"></div>
+          </div>
+          
+          <div style="padding: 0 16px;">
+             <ion-item lines="none" style="--background: #fff; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(219,39,119,0.03);">
+                <ion-icon name="checkmark-circle" color="success" slot="start" style="font-size: 28px;"></ion-icon>
+                <ion-label>
+                  <h2 style="font-weight: 700; color: #831843;">مجموع المهام المنجزة</h2>
+                  <p id="total-tasks-stat">0 مهمة مكتملة</p>
+                </ion-label>
+             </ion-item>
+             
+             <ion-item lines="none" style="--background: #fff; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(219,39,119,0.03);">
+                <ion-icon name="body" color="secondary" slot="start" style="font-size: 28px; color: #db2777;"></ion-icon>
+                <ion-label>
+                  <h2 style="font-weight: 700; color: #831843;">البيانات الأساسية</h2>
+                  <p>العمر: 20 | الطول: 149 سم | الوزن: 52 كجم</p>
+                </ion-label>
+             </ion-item>
+          </div>
+        </ion-content>
+      </ion-tab>
+
+      <!-- Bottom Tab Bar -->
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="plan">
+          <ion-icon name="calendar-clear"></ion-icon>
+          <ion-label>المهام</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="progress">
+          <ion-icon name="stats-chart"></ion-icon>
+          <ion-label>الإحصائيات</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-app>
+
+  <script>
+    const mealsList = [
+      { breakfast: "شوكولاتة داكنة + توست أسمر ببيضة مسلوقة", lunch: "120جم صدر دجاج + 4 ملاعق أرز أبيض + سلطة خضراء", dinner: "علبة تونة مصفاة + خيار وخص", snack: "تفاحة + 7 حبات لوز" },
+      { breakfast: "شوفان بحليب قليل الدسم وعسل وقرفة", lunch: "120جم سمك أو لحم مشوي + بطاطس مهروسة", dinner: "زبادي يوناني مع بذور الشيا", snack: "موزة صغيرة" },
+      { breakfast: "بان كيك صحي (موز وبيض)", lunch: "دجاج بالفرن + خضار مشوية + 4 ملاعق أرز", dinner: "بيضتان مسلوقتان + طماطم وجرجير", snack: "تمرتان + مكسرات" },
+      { breakfast: "خبز أسمر مع لبنة خالية الدسم وزعتر", lunch: "سلطة كينوا بالدجاج والخيار والليمون", dinner: "جبن قريش أو حلوم مشوي + شرائح طماطم", snack: "كوب توت أو فراولة" },
+      { breakfast: "عجة بيض بالسبانخ والفطر", lunch: "دجاج شاورما منزلي + خبز بر صغير + سلطة", dinner: "شوربة عدس خفيفة", snack: "برتقالة" },
+      { breakfast: "زبادي يوناني مع قطع الفواكه", lunch: "لحم مفروم قليل الدهن + مكرونة سمراء", dinner: "سلطة يوناني بجبنة الفيتا", snack: "جزر وخيار مع حمص طحينة" },
+      { breakfast: "توست أسمر وزبدة فول سوداني", lunch: "كبسة دجاج صحية (أرز بسمتي ومكسرات قليلة)", dinner: "تونة مع عصير ليمون وزيت زيتون", snack: "حبة تمر + حليب دافئ" }
+    ];
+
+    const gymWorkouts = {
+      day1: [
+        "إحمّاء خفيف ومطاط (10 دقائق)",
+        "تمرين القرفصاء بالدمبل (Goblet Squats) - 3 مجموعات × 12 تكرار",
+        "دفع الساقين (Leg Press) أو رومانيان ديدليفت بالدمبل - 3 × 12",
+        "جسر الحوض بالوزن (Hip Thrusts) - 3 × 15",
+        "تمارين بطن خفيفة (Crunches) - 3 × 15"
+      ],
+      day2: [
+        "إحمّاء ومطاط",
+        "سحب أرضي بالكيبل أو دمبل (Seated/Bent-over Rows) - 3 × 12",
+        "ضغط الصدر بالدمبل (Dumbbell Bench Press) - 3 × 10",
+        "رفراف جانبي للأكتاف بالدمبل - 3 × 12",
+        "كارديو خفيف (مشي على السير مائل) - 15 دقيقة"
+      ],
+      day3: [
+        "إحمّاء ومطاط",
+        "طعن خلفي بالدمبل (Bulgarian Split Squats أو Lunges) - 3 × 10 لكل رجل",
+        "رفعت الفخذ الجانبية (Clamshells / Cable Kickbacks) - 3 × 15",
+        "تمديد الساق للأرجل الأمامية (Leg Extensions) - 3 × 12",
+        "بلانك ثبات (Plank) - 3 جولات × 30 ثانية"
+      ],
+      day4: [
+        "إحمّاء ومطاط",
+        "تمرين السحب العُلوي (Lat Pulldown) - 3 × 12",
+        "ضغط الكتف بالدمبل جالسة (Dumbbell Shoulder Press) - 3 × 10",
+        "ترايسبس بالدمبل خلف الرأس - 3 × 12",
+        "كارديو خفيف (أبتيليكال) - 15 دقيقة"
+      ],
+      day5: [
+        "إحمّاء ومطاط شامل",
+        "سومو سكوات بالدمبل (Sumo Squats) - 3 × 15",
+        "رفعت الميت الرومانية (Romanian Deadlifts) - 3 × 12",
+        "بطن وخصر (Russian Twists) - 3 × 20",
+        "استرخاء وإطالات عضلية عميقة - 10 دقائق"
+      ]
+    };
+
+    const restDayActivities = [
+      "مشي خفيف في الهواء الطلق (6,000 خطوة)",
+      "إطالات استشفائية خفيفة للجسم بالكامل",
+      "جلسة استرخاء والعناية بالبشرة والترطيب",
+      "جلسة يوغا أو تنفس عميق (15 دقيقة)"
+    ];
+
+    let userProgress = JSON.parse(localStorage.getItem('femaleChallengeProgress')) || {};
+    let currentDay = 1;
+
+    const daySelect = document.getElementById('day-select');
+    const openDayBtn = document.getElementById('open-day-select');
+    const dayBtnText = document.getElementById('day-btn-text');
+    const nutList = document.getElementById('nutrition-list');
+    const workList = document.getElementById('workout-list');
+
+    for(let i=1; i<=60; i++){
+      const opt = document.createElement('ion-select-option');
+      opt.value = i; opt.textContent = `اليوم ${i}`;
+      daySelect.appendChild(opt);
+    }
+
+    openDayBtn.addEventListener('click', () => daySelect.open());
+    
+    daySelect.addEventListener('ionChange', (e) => {
+      currentDay = parseInt(e.detail.value);
+      dayBtnText.innerText = `عرض الأيام: اليوم ${currentDay}`;
+      renderDay(currentDay);
+    });
+
+    function createItemHtml(day, id, label, badgeText, badgeClass, iconHTML) {
+      const key = `d${day}_${id}`;
+      const checked = userProgress[key] ? 'checked="true"' : '';
+      const compClass = userProgress[key] ? 'completed' : '';
+      const badge = badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : '';
+      return `
+        <ion-item class="task-item ${compClass}" lines="none">
+          <ion-checkbox slot="start" data-key="${key}" ${checked}></ion-checkbox>
+          <ion-label class="ion-text-wrap">${label}</ion-label>
+          ${badge}
+          ${iconHTML || ''}
+        </ion-item>`;
+    }
+
+    function renderDay(day) {
+      const dayInWeek = ((day - 1) % 7) + 1;
+      const isCheatDay = (day % 10 === 0);
+      const meal = mealsList[(day - 1) % 7];
+      const isGymDay = (dayInWeek <= 5);
+
+      let nHtml = `<div class="list-header-custom"><span style="font-size: 1.4rem;">🥗</span> البرنامج الغذائي</div>`;
+      nHtml += createItemHtml(day, 'n_bf', meal.breakfast, 'إفطار', 'badge-meal');
+      
+      if(isCheatDay) {
+        nHtml += createItemHtml(day, 'n_cht', 'وجبة مفتوحة لذيذة باختيارك (باعتدال)', 'وجبة مفتوحة', 'badge-cheat');
+        nHtml += createItemHtml(day, 'n_oth', `الوجبة الأخرى: ${meal.lunch}`, 'غداء صحي', 'badge-meal');
+      } else {
+        nHtml += createItemHtml(day, 'n_lun', meal.lunch, 'غداء', 'badge-meal');
+        nHtml += createItemHtml(day, 'n_din', meal.dinner, 'عشاء', 'badge-meal');
+      }
+      nHtml += createItemHtml(day, 'n_snk', meal.snack, 'سناك', 'badge-meal');
+      nHtml += createItemHtml(day, 'n_wtr', 'شرب 2.5 إلى 3 لتر ماء بانتظام', '', '', '<ion-icon name="water" color="primary" slot="end" style="color:#db2777;"></ion-icon>');
+      nutList.innerHTML = nHtml;
+
+      let wHtml = `<div class="list-header-custom"><span style="font-size: 1.4rem;">${isGymDay ? '🏋️‍♀️' : '🧘‍♀️'}</span> ${isGymDay ? `تمرين الحديد (اليوم ${dayInWeek} من الأسبوع)` : 'راحة واستشفاء'}</div>`;
+      
+      if(isGymDay) {
+        let exercises = gymWorkouts[`day${dayInWeek}`];
+        exercises.forEach((ex, i) => {
+          wHtml += createItemHtml(day, `w_ex_${i}`, ex, 'حديد', 'badge-gym');
+        });
+      } else {
+        restDayActivities.forEach((act, i) => {
+          wHtml += createItemHtml(day, `w_rs_${i}`, act, 'استشفاء', 'badge-rest');
+        });
+      }
+      wHtml += createItemHtml(day, 'w_stp', 'إكمال 6,000 إلى 8,000 خطوة يومياً', 'مشي', 'badge-gym', '<ion-icon name="walk" color="success" slot="end"></ion-icon>');
+      workList.innerHTML = wHtml;
+
+      updateStatsDisplay();
+    }
+
+    document.addEventListener('ionChange', (e) => {
+      if (e.target.tagName.toLowerCase() === 'ion-checkbox') {
+        const key = e.target.getAttribute('data-key');
+        if(!key) return;
+        
+        const isChecked = e.detail.checked;
+        const item = e.target.closest('ion-item');
+        
+        userProgress[key] = isChecked;
+        localStorage.setItem('femaleChallengeProgress', JSON.stringify(userProgress));
+
+        if(isChecked) {
+          item.classList.add('completed');
+          e.target.classList.add('animated');
+          setTimeout(() => e.target.classList.remove('animated'), 400);
+
+          const rect = e.target.getBoundingClientRect();
+          const x = (rect.left + rect.width / 2) / window.innerWidth;
+          const y = (rect.top + rect.height / 2) / window.innerHeight;
+          
+          confetti({
+            particleCount: 45, spread: 70, origin: { x, y },
+            colors: ['#db2777', '#f472b6', '#fb7185', '#e11d48'], disableForReducedMotion: true
+          });
+        } else {
+          item.classList.remove('completed');
+        }
+        
+        updateStatsDisplay();
+      }
+    });
+
+    function updateStatsDisplay() {
+      let todayTotal = 0;
+      let todayCompleted = 0;
+      let allCompleted = 0;
+
+      allCompleted = Object.values(userProgress).filter(v => v === true).length;
+      
+      const currentDayCheckboxes = document.querySelectorAll('ion-checkbox[data-key]');
+      todayTotal = currentDayCheckboxes.length;
+      
+      currentDayCheckboxes.forEach(cb => {
+        if(userProgress[cb.getAttribute('data-key')]) todayCompleted++;
+      });
+
+      const todayPercent = todayTotal > 0 ? Math.round((todayCompleted / todayTotal) * 100) : 0;
+      
+      document.getElementById('streak-stat').innerText = allCompleted;
+      document.getElementById('today-progress').innerText = todayPercent + '%';
+      document.getElementById('total-tasks-stat').innerText = `${allCompleted} مهمة مكتملة إجمالاً`;
+    }
+
+    let chart;
+    function initChart() {
+      var options = {
+        series: [{ name: 'نسبة الإنجاز', data: [15, 40, 60, 75, 80, 88, 92, 95, 100] }],
+        chart: { height: 280, type: 'area', fontFamily: 'Tajawal, sans-serif', toolbar: { show: false } },
+        colors: ['#db2777'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 4 },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [0, 90, 100] } },
+        xaxis: { categories: ['أ 1', 'أ 2', 'أ 3', 'أ 4', 'أ 5', 'أ 6', 'أ 7', 'أ 8', 'أ 9'], axisBorder: { show: false }, axisTicks: { show: false } },
+        yaxis: { max: 100, labels: { formatter: (val) => val + "%" } },
+        grid: { borderColor: '#fbcfe8', strokeDashArray: 4 }
+      };
+      chart = new ApexCharts(document.querySelector("#apex-chart"), options);
+      chart.render();
+    }
+
+    let chartRendered = false;
+    document.addEventListener('ionTabWillChange', (e) => {
+        if(e.detail.tab === 'progress' && !chartRendered) {
+            setTimeout(() => {
+                initChart();
+                chartRendered = true;
+            }, 150); 
+        }
+    });
+
+    renderDay(currentDay);
+  </script>
+</body>
+</html>
